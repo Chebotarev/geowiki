@@ -16,7 +16,7 @@ func (p *Page) save() error {
   return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
-func load(title string) (*Page, error) {
+func loadPage(title string) (*Page, error) {
   filename := title + ".txt"
   body, err := ioutil.ReadFile(filename)
   if err != nil {
@@ -29,7 +29,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintf(w, "Hello World! You are at: %s!", r.URL.Path[1:])
 }
 
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+  title := r.URL.Path[len("/view/"):]
+  p, _ := loadPage(title)
+  fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+}
+
 func main() {
-  http.HandleFunc("/", handler)
+  http.HandleFunc("/", viewHandler)
   http.ListenAndServe(":8080", nil)
 }
